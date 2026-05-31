@@ -245,7 +245,10 @@
   <div class="success-title">Entry Saved!</div>
   <div class="success-sub" id="successTime">-</div>
   <div class="entry-summary" id="entrySummary"></div>
-  <div id="sheetStatus" style="text-align:center;font-size:13px;color:var(--muted);margin-bottom:12px;">⏳ Saving to Google Sheet...</div>
+  <div id="sheetStatus" style="text-align:center;font-size:13px;color:var(--muted);margin-bottom:12px;"></div>
+  <button id="formOpenBtn" style="display:none;width:100%;background:linear-gradient(135deg,#FF6B35,#f7a97c);border:none;border-radius:14px;padding:16px;color:#fff;font-size:16px;font-weight:700;font-family:'Rajdhani',sans-serif;cursor:pointer;margin-bottom:12px;">
+    📋 Tap Here to Submit to Google Sheet
+  </button>
   <button class="new-entry-btn" onclick="newEntry()">➕ Add Another Entry</button>
   <a href="https://docs.google.com/spreadsheets/d/1GfPAf0ob6ylxiFg3fNmCUozJFYsMoH8lIfozYnInPG8" target="_blank" style="display:block;text-align:center;padding:12px;color:var(--muted);font-size:13px;text-decoration:none;border:1px solid var(--border);border-radius:12px;">📊 View Production Sheet</a>
 </div>
@@ -607,6 +610,7 @@ function newEntry() {
   document.getElementById('thickness').value = '';
   document.getElementById('thickCheck').className = 'thick-check';
   selectedPass = null;
+  document.getElementById('formOpenBtn').style.display = 'none';
   ['Yellow','Blue','Black','Silver'].forEach(t => document.getElementById('pass'+t)?.classList.remove('selected'));
   populateDropdowns();
   changePart();
