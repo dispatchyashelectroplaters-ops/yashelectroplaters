@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Production Entry – Yash Electroplaters</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117; --card: #161b27; --border: #1e2535;
+    --accent: #2EC4B6; --orange: #FF6B35; --text: #e8eaf0;
+    --muted: #8892b0; --green: #06A77D; --red: #ff4757;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; padding-bottom:40px; }
+
+  .header {
+    background:linear-gradient(135deg,#161b27,#1a2030);
+    border-bottom:1px solid var(--border);
+    padding:14px 16px;
+    display:flex; align-items:center; justify-content:space-between;
+    position:sticky; top:0; z-index:100;
+  }
+  .header-left { display:flex; align-items:center; gap:10px; }
+  .logo-badge {
+    width:36px; height:36px;
+    background:linear-gradient(135deg,var(--orange),#f7a97c);
+    border-radius:9px; display:flex; align-items:center; justify-content:center;
+    font-family:'Rajdhani',sans-serif; font-weight:700; font-size:15px; color:#fff; flex-shrink:0;
+  }
+  .header-text h1 { font-family:'Rajdhani',sans-serif; font-size:15px; font-weight:700; color:#fff; }
+  .header-text p { font-size:10px; color:var(--muted); }
+  .master-btn {
+    background:rgba(255,107,53,0.12); border:1px solid rgba(255,107,53,0.3);
+    border-radius:8px; padding:6px 12px; color:var(--orange);
+    font-size:12px; font-weight:600; cursor:pointer;
+  }
+
+  .screen { display:none; padding:14px; }
+  .screen.active { display:block; }
+
+  .card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:14px; margin-bottom:12px; }
+  .card-title { font-size:11px; font-weight:600; color:var(--accent); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; }
+
+  .search-wrap { position:relative; margin-bottom:12px; }
+  .search-wrap input {
+    width:100%; background:#0d1117; border:1.5px solid var(--border);
+    border-radius:12px; padding:13px 14px 13px 42px;
+    color:var(--text); font-size:16px; font-family:'DM Sans',sans-serif; outline:none;
+  }
+  .search-wrap input:focus { border-color:var(--accent); }
+  .search-icon { position:absolute; left:13px; top:50%; transform:translateY(-50%); font-size:17px; color:var(--muted); }
+
+  .part-list { max-height:300px; overflow-y:auto; }
+  .part-item {
+    padding:11px 13px; background:#0d1117; border:1px solid var(--border);
+    border-radius:10px; margin-bottom:6px; cursor:pointer;
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    transition:border-color 0.15s;
+  }
+  .part-item:active { border-color:var(--accent); background:#0f2320; }
+  .part-num { font-family:'Rajdhani',sans-serif; font-size:19px; font-weight:700; color:#fff; min-width:46px; }
+  .part-info { flex:1; }
+  .part-type { font-size:11px; color:var(--muted); margin-top:1px; }
+  .part-thick { font-size:11px; background:rgba(46,196,182,0.12); color:var(--accent); padding:2px 8px; border-radius:20px; white-space:nowrap; font-weight:600; }
+
+  .selected-banner {
+    background:linear-gradient(135deg,rgba(46,196,182,0.1),rgba(46,196,182,0.05));
+    border:1.5px solid rgba(46,196,182,0.3); border-radius:12px;
+    padding:12px 14px; margin-bottom:12px; display:none; align-items:center; gap:12px;
+  }
+  .selected-banner.show { display:flex; }
+  .selected-banner .part-big { font-family:'Rajdhani',sans-serif; font-size:28px; font-weight:700; color:var(--accent); line-height:1; }
+  .selected-banner .ptype { font-size:13px; color:var(--text); font-weight:600; }
+  .selected-banner .pthick { font-size:12px; color:var(--accent); margin-top:3px; }
+  .change-btn { background:rgba(255,107,53,0.1); border:1px solid rgba(255,107,53,0.3); border-radius:8px; padding:5px 10px; color:var(--orange); font-size:11px; font-weight:600; cursor:pointer; white-space:nowrap; }
+
+  .field-group { margin-bottom:12px; }
+  .field-label { font-size:12px; color:var(--muted); font-weight:600; margin-bottom:5px; }
+  .field-label .req { color:var(--red); }
+  .field-input {
+    width:100%; background:#0d1117; border:1.5px solid var(--border);
+    border-radius:10px; padding:12px 13px; color:var(--text);
+    font-size:16px; font-family:'DM Sans',sans-serif; outline:none; -webkit-appearance:none;
+  }
+  .field-input:focus { border-color:var(--accent); }
+  .field-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+  /* Passivation type buttons */
+  .pass-options { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .pass-btn {
+    padding:12px 8px; border-radius:10px; border:1.5px solid var(--border);
+    background:#0d1117; cursor:pointer; text-align:center;
+    font-size:13px; font-weight:600; color:var(--muted);
+    transition:all 0.15s;
+  }
+  .pass-btn.selected { border-color:var(--accent); background:rgba(46,196,182,0.1); color:var(--accent); }
+  .pass-btn .pass-dot { width:16px; height:16px; border-radius:50%; margin:0 auto 5px; }
+
+  .thick-check { margin-top:6px; padding:8px 12px; border-radius:8px; font-size:12px; font-weight:600; display:none; }
+  .thick-check.ok { background:rgba(6,167,125,0.12); color:var(--green); border:1px solid rgba(6,167,125,0.3); display:block; }
+  .thick-check.fail { background:rgba(255,71,87,0.12); color:var(--red); border:1px solid rgba(255,71,87,0.3); display:block; }
+
+  .submit-btn {
+    width:100%; background:linear-gradient(135deg,var(--accent),#06A77D);
+    border:none; border-radius:14px; padding:16px; color:#fff;
+    font-size:16px; font-weight:700; font-family:'Rajdhani',sans-serif;
+    letter-spacing:0.5px; cursor:pointer; margin-top:4px;
+  }
+  .submit-btn:active { opacity:0.85; }
+
+  /* Success */
+  .success-icon { width:72px; height:72px; background:rgba(6,167,125,0.15); border:2px solid rgba(6,167,125,0.4); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:32px; margin:28px auto 16px; }
+  .success-title { font-family:'Rajdhani',sans-serif; font-size:26px; font-weight:700; color:var(--green); text-align:center; }
+  .success-sub { text-align:center; color:var(--muted); font-size:13px; margin-top:5px; }
+  .entry-summary { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px; margin:18px 0; }
+  .summary-row { display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px solid var(--border); font-size:13px; }
+  .summary-row:last-child { border-bottom:none; }
+  .summary-label { color:var(--muted); }
+  .summary-val { color:var(--text); font-weight:600; text-align:right; max-width:60%; }
+  .new-entry-btn { width:100%; background:var(--card); border:1.5px solid var(--accent); border-radius:14px; padding:14px; color:var(--accent); font-size:15px; font-weight:700; font-family:'Rajdhani',sans-serif; cursor:pointer; margin-bottom:10px; }
+
+  /* Master Data screen */
+  .master-section { margin-bottom:20px; }
+  .master-section h3 { font-family:'Rajdhani',sans-serif; font-size:16px; font-weight:700; color:var(--text); margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+  .master-list { background:#0d1117; border:1px solid var(--border); border-radius:10px; overflow:hidden; margin-bottom:10px; }
+  .master-item { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border-bottom:1px solid var(--border); font-size:13px; }
+  .master-item:last-child { border-bottom:none; }
+  .master-item-info { flex:1; }
+  .master-item-title { color:var(--text); font-weight:600; }
+  .master-item-sub { color:var(--muted); font-size:11px; margin-top:2px; }
+  .del-btn { background:rgba(255,71,87,0.1); border:1px solid rgba(255,71,87,0.2); border-radius:6px; padding:4px 10px; color:var(--red); font-size:11px; cursor:pointer; }
+  .add-row { display:flex; gap:8px; margin-top:8px; }
+  .add-input { flex:1; background:#0d1117; border:1.5px solid var(--border); border-radius:10px; padding:10px 12px; color:var(--text); font-size:14px; font-family:'DM Sans',sans-serif; outline:none; }
+  .add-input:focus { border-color:var(--accent); }
+  .add-btn { background:var(--accent); border:none; border-radius:10px; padding:10px 16px; color:#fff; font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap; }
+  .part-add-row { display:grid; grid-template-columns:80px 1fr 90px auto; gap:6px; margin-top:8px; }
+  .save-note { font-size:11px; color:var(--muted); margin-top:6px; line-height:1.5; }
+  .back-btn { background:transparent; border:1px solid var(--border); border-radius:10px; padding:10px 16px; color:var(--muted); font-size:13px; cursor:pointer; width:100%; margin-top:16px; }
+  .no-results { text-align:center; color:var(--muted); padding:20px; font-size:13px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo-badge">Y≡</div>
+    <div class="header-text">
+      <h1>YASH ELECTROPLATERS</h1>
+      <p id="headerSub">Production Entry</p>
+    </div>
+  </div>
+  <button class="master-btn" onclick="showMaster()">⚙️ Master Data</button>
+</div>
+
+<!-- SCREEN: Form -->
+<div class="screen active" id="screenForm">
+
+  <div class="card">
+    <div class="card-title">📋 Entry Details</div>
+    <div class="field-row">
+      <div class="field-group">
+        <div class="field-label">Date <span class="req">*</span></div>
+        <input type="date" class="field-input" id="entryDate">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Machine <span class="req">*</span></div>
+        <select class="field-input" id="machine"><option value="">Select...</option></select>
+      </div>
+    </div>
+    <div class="field-group">
+      <div class="field-label">Operator <span class="req">*</span></div>
+      <select class="field-input" id="operator"><option value="">Select...</option></select>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔍 Select Part</div>
+    <div class="selected-banner" id="selectedBanner">
+      <div style="flex:1">
+        <div class="ptype" id="bannerPartNum" style="font-size:16px;font-weight:700;color:var(--accent);">-</div>
+        <div class="ptype" id="bannerPartType">-</div>
+        <div class="pthick" id="bannerPartThick">Required: -</div>
+      </div>
+      <button class="change-btn" onclick="changePart()">Change</button>
+    </div>
+    <div id="searchArea">
+      <div class="search-wrap">
+        <span class="search-icon">🔎</span>
+        <input type="text" id="partSearch" placeholder="Type part name or number e.g. 2220, Terminal, Lip seal" oninput="filterParts()" autocomplete="off">
+      </div>
+      <div class="part-list" id="partList"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">⚙️ Production Details</div>
+    <div class="field-row">
+      <div class="field-group">
+        <div class="field-label">Time IN <span class="req">*</span></div>
+        <input type="time" class="field-input" id="timeIn">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Time OUT <span class="req">*</span></div>
+        <input type="time" class="field-input" id="timeOut">
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field-group">
+        <div class="field-label">Total Qty <span class="req">*</span></div>
+        <input type="number" class="field-input" id="qty" placeholder="0">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Thickness (micron) <span class="req">*</span></div>
+        <input type="number" class="field-input" id="thickness" placeholder="0" oninput="checkThickness()" step="0.1">
+      </div>
+    </div>
+    <div class="thick-check" id="thickCheck"></div>
+
+    <div class="field-group" style="margin-top:4px">
+      <div class="field-label">Passivation Type <span class="req">*</span></div>
+      <div class="pass-options">
+        <button class="pass-btn" onclick="selectPass('Yellow')" id="passYellow">
+          <div class="pass-dot" style="background:#f5c518;"></div>🟡 Yellow
+        </button>
+        <button class="pass-btn" onclick="selectPass('Blue')" id="passBlue">
+          <div class="pass-dot" style="background:#4a90d9;"></div>🔵 Blue
+        </button>
+        <button class="pass-btn" onclick="selectPass('Black')" id="passBlack">
+          <div class="pass-dot" style="background:#333;border:1px solid #666;"></div>⚫ Black
+        </button>
+        <button class="pass-btn" onclick="selectPass('Silver (Zn-Ni)')" id="passSilver">
+          <div class="pass-dot" style="background:linear-gradient(135deg,#c0c0c0,#e8e8e8);"></div>⚪ Silver (Zn-Ni)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <button class="submit-btn" onclick="submitEntry()">✅ Submit Entry</button>
+</div>
+
+<!-- SCREEN: Success -->
+<div class="screen" id="screenSuccess">
+  <div class="success-icon">✅</div>
+  <div class="success-title">Entry Saved!</div>
+  <div class="success-sub" id="successTime">-</div>
+  <div class="entry-summary" id="entrySummary"></div>
+  <div id="sheetStatus" style="text-align:center;font-size:13px;color:var(--muted);margin-bottom:12px;">⏳ Saving to Google Sheet...</div>
+  <button class="new-entry-btn" onclick="newEntry()">➕ Add Another Entry</button>
+  <a href="https://docs.google.com/spreadsheets/d/1GfPAf0ob6ylxiFg3fNmCUozJFYsMoH8lIfozYnInPG8" target="_blank" style="display:block;text-align:center;padding:12px;color:var(--muted);font-size:13px;text-decoration:none;border:1px solid var(--border);border-radius:12px;">📊 View Production Sheet</a>
+</div>
+
+<!-- SCREEN: Master Data -->
+<div class="screen" id="screenMaster">
+  <div class="card">
+    <div style="font-size:12px; color:var(--muted); line-height:1.6; margin-bottom:4px;">
+      ✏️ Add or remove operators, machines, and parts here. Changes are saved on this device. To update the file permanently, share the updated file with your team.
+    </div>
+  </div>
+
+  <!-- Operators -->
+  <div class="master-section">
+    <div class="card">
+      <div class="card-title">👷 Operators</div>
+      <div class="master-list" id="operatorList"></div>
+      <div class="add-row">
+        <input class="add-input" id="newOperator" placeholder="Operator name">
+        <button class="add-btn" onclick="addOperator()">+ Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Machines -->
+  <div class="master-section">
+    <div class="card">
+      <div class="card-title">🏭 Machines</div>
+      <div class="master-list" id="machineList"></div>
+      <div class="add-row">
+        <input class="add-input" id="newMachine" placeholder="Machine name e.g. Zn T-03">
+        <button class="add-btn" onclick="addMachine()">+ Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Parts -->
+  <div class="master-section">
+    <div class="card">
+      <div class="card-title">🔩 All Parts — <span id="partCount">0</span> parts</div>
+      <div style="font-size:11px; color:var(--muted); margin-bottom:12px;">Add any part — RSPL number, Terminal Box Cover, Lip Seal, or any other part name.</div>
+      <div class="field-group">
+        <div class="field-label">Part Name / Number</div>
+        <input class="add-input" id="newPartNum" placeholder="e.g. RSPL 3900, Terminal Box Cover, Lip Seal" style="width:100%;">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Plating Type</div>
+        <input class="add-input" id="newPartType" placeholder="e.g. Zinc Plating, Zinc Nickel Plating" style="width:100%;">
+      </div>
+      <div class="add-row">
+        <div style="flex:1">
+          <div class="field-label">Thickness Spec</div>
+          <input class="add-input" id="newPartThick" placeholder="e.g. 8~12 or Min 12 or N/A" style="width:100%;">
+        </div>
+        <div style="display:flex;align-items:flex-end;">
+          <button class="add-btn" onclick="addPart()" style="height:44px;margin-left:8px;">+ Add Part</button>
+        </div>
+      </div>
+      <div class="save-note">💡 Use 8~12 for range, Min 12 for minimum, or N/A if not applicable.</div>
+      <div style="margin-top:14px;">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">Search parts:</div>
+        <input class="add-input" id="masterPartSearch" placeholder="Search by name or number..." oninput="renderMasterLists()" style="width:100%;margin-bottom:10px;">
+        <div style="max-height:250px; overflow-y:auto;" id="recentPartsList"></div>
+      </div>
+    </div>
+  </div>
+
+  <button class="back-btn" onclick="showForm()">← Back to Entry Form</button>
+</div>
+
+<script>
+// ============================================================
+// MASTER DATA — Edit these arrays to update defaults
+// ============================================================
+const DEFAULT_OPERATORS = ["Deepak","Rakesh","Randhir","Suraj"];
+const DEFAULT_MACHINES  = ["Zn T-01","Zn T-02","Zn-Ni T01","Zn-Ni T02"];
+const DEFAULT_PARTS = [
+  {"part":"637","type":"Zinc Nickel Plating","thickness":"8~12"},
+  {"part":"640","type":"Zinc Nickel Plating","thickness":"8~12"},
+  {"part":"643","type":"Zinc Nickel Plating","thickness":"8~12"},
+  {"part":"723","type":"Zinc Nickel Plating","thickness":"8~12"},
+  {"part":"742","type":"Zinc Nickel Plating","thickness":"8~12"},
+  {"part":"932","type":"Trivalent Zinc Plating","thickness":"8~12"},
+  {"part":"933","type":"Trivalent Zinc Plating","thickness":"8~12"},
+  {"part":"937","type":"Trivalent Zinc Plating","thickness":"8~12"},
+  {"part":"947","type":"Trivalent Zinc Plating","thickness":"8~12"},
+  {"part":"1014","type":"Zinc Nickel Plating with seal","thickness":"8~12"},
+  {"part":"1015","type":"Zinc Nickel Plating with seal","thickness":"8~12"},
+  {"part":"1139","type":"Trivalent Zinc Plating","thickness":"Min 12"},
+  {"part":"1140","type":"Trivalent Zinc Plating","thickness":"Min 12"},
+  {"part":"1141","type":"Trivalent Zinc Plating","thickness":"Min 12"},
+  {"part":"1159","type":"Zinc Nickel Plating","thickness":"8~12"},
+  {"part":"1160","type":"Zinc Nickel Plating","thickness":"8~12"},
+  {"part":"1161","type":"Zinc Nickel Plating","thickness":"8~12"},
+  {"part":"1164","type":"Zinc Nickel Plating","thickness":"8~12"},
+  {"part":"1187","type":"Trivalent Zinc Plating","thickness":"Min 12"},
+  {"part":"1188","type":"Trivalent Zinc Plating","thickness":"Min 12"},
+  {"part":"1317","type":"Trivalent Zinc Plating","thickness":"Min 10"},
+  {"part":"1384","type":"Trivalent Zinc Plating","thickness":"12~16"},
+  {"part":"1459","type":"Trivalent Zinc Plating","thickness":"8~12"},
+  {"part":"1507","type":"Trivalent Zinc Plating without seal","thickness":"12~15"},
+  {"part":"1625","type":"Zinc Nickel Plating","thickness":"8~12"},
+  {"part":"1677","type":"Trivalent Zinc Plating","thickness":"Min 8"},
+  {"part":"1711","type":"Trivalent Zinc Plating without seal","thickness":"12~15"},
+  {"part":"1714","type":"Trivalent Zinc Plating without seal","thickness":"12~15"},
+  {"part":"1762","type":"Trivalent Zinc Plating CR3","thickness":"8~12"},
+  {"part":"1809","type":"Trivalent Zinc Plating CR3","thickness":"Min 25"},
+  {"part":"1924","type":"Zinc Plating","thickness":"12~15"},
+  {"part":"1925","type":"Zinc Plating","thickness":"12~15"},
+  {"part":"1926","type":"Zinc Plating","thickness":"12~15"},
+  {"part":"1957","type":"Trivalent Zinc Plating without seal","thickness":"12~15"},
+  {"part":"1965","type":"Trivalent Zinc Plating","thickness":"12~18"},
+  {"part":"1966","type":"Trivalent Zinc Plating","thickness":"12~18"},
+  {"part":"1971","type":"Zinc Nickel Plating","thickness":"8~12"},
+  {"part":"1975","type":"Trivalent Zinc Plating","thickness":"Min 12"},
+  {"part":"1989","type":"Zinc Nickel Plating T2","thickness":"8~12"},
+  {"part":"2123","type":"Trivalent Zinc Plating without seal","thickness":"12~15"},
+  {"part":"2124","type":"Trivalent Zinc Plating without seal","thickness":"12~15"},
+  {"part":"2139","type":"Trivalent Zinc Plating","thickness":"Min 12"},
+  {"part":"2150","type":"Trivalent Zinc Plating CR3","thickness":"Min 25"},
+  {"part":"2192","type":"Trivalent Zinc Plating CR3","thickness":"8~12"},
+  {"part":"2202","type":"Trivalent Zinc Plating CR3","thickness":"8~12"},
+  {"part":"2209","type":"Zinc Nickel Plating","thickness":"6~8"},
+  {"part":"2216","type":"Zinc Plating Cr6 free","thickness":"12~15"},
+  {"part":"2217","type":"Zinc Plating Cr6 free","thickness":"12~15"},
+  {"part":"2219","type":"Zinc Plating Cr6 free","thickness":"12~15"},
+  {"part":"2220","type":"Zinc Plating","thickness":"12~15"},
+  {"part":"2221","type":"Trivalent Zinc Plating CR3","thickness":"Min 25"},
+  {"part":"2224","type":"Zinc Nickel Plating","thickness":"6~8"},
+  {"part":"2232","type":"Trivalent Zinc Plating CR3 with seal","thickness":"Min 12"},
+  {"part":"2233","type":"Trivalent Zinc Plating CR3","thickness":"Min 12"},
+  {"part":"2281","type":"Trivalent Zinc Plating","thickness":"8~12"},
+  {"part":"2301","type":"Trivalent Zinc Plating CR3","thickness":"Min 12"},
+  {"part":"2302","type":"Trivalent Zinc Plating","thickness":"12~15"},
+  {"part":"2338","type":"Trivalent Zinc Plating","thickness":"12~15"},
+  {"part":"2367","type":"Trivalent Zinc Plating","thickness":"12~16"},
+  {"part":"2395","type":"Trivalent Zinc Plating","thickness":"15~20"},
+  {"part":"2426","type":"Trivalent Zinc Plating with seal","thickness":"15~20"},
+  {"part":"2478","type":"Zinc Nickel Plating","thickness":"12~18"},
+  {"part":"2479","type":"Zinc Nickel Plating","thickness":"12~18"},
+  {"part":"2535","type":"Trivalent Zinc Plating with seal","thickness":"12~15"},
+  {"part":"2548","type":"Trivalent Zinc Plating with seal","thickness":"12~15"},
+  {"part":"2580","type":"Trivalent Zinc Plating with seal","thickness":"12~15"},
+  {"part":"2637","type":"Zinc Trivalent Plating","thickness":"8~15"},
+  {"part":"2643","type":"Trivalent Zinc Plating Cr6 free","thickness":"12~18"},
+  {"part":"2652","type":"Zinc Nickel Plating","thickness":"8~12"},
+  {"part":"2680","type":"Zinc Plating Non Hex Cr","thickness":"Min 5"},
+  {"part":"2681","type":"Zinc Plating Non Hex Cr","thickness":"Min 5"},
+  {"part":"2712","type":"Electroless Nickel Plating","thickness":"13~17"},
+  {"part":"2748","type":"Trivalent Zinc Plating without seal","thickness":"12~15"},
+  {"part":"2749","type":"Trivalent Zinc Plating without seal","thickness":"12~15"},
+  {"part":"2750","type":"Trivalent Zinc Plating without seal","thickness":"12~15"},
+  {"part":"2778","type":"Zinc Plating CR3","thickness":"8~13"},
+  {"part":"2820","type":"Zinc Nickel Plating","thickness":"8~12"},
+  {"part":"2857","type":"Trivalent Zinc Plating without seal","thickness":"12~15"},
+  {"part":"2869","type":"Trivalent Zinc Plating CrVI free","thickness":"5~12"},
+  {"part":"2871","type":"Trivalent Zinc Plating Cr6 free","thickness":"5~12"},
+  {"part":"2993","type":"Zinc Plating Cr6 free","thickness":"12~15"},
+  {"part":"3032","type":"Trivalent Zinc Plating Cr6 free","thickness":"12~15"},
+  {"part":"3067","type":"Zinc Electroplating Cr6 free","thickness":"Min 3"},
+  {"part":"3095","type":"Zinc Nickel Plating without seal","thickness":"8~12"},
+  {"part":"3099","type":"Zinc Nickel Plating without seal","thickness":"12~18"},
+  {"part":"3141","type":"Zinc Flake Coating","thickness":"Min 5"},
+  {"part":"3142","type":"Zinc Flake Coating","thickness":"Min 5"},
+  {"part":"3148","type":"Trivalent Zinc Plating","thickness":"25~30"},
+  {"part":"3153","type":"Zinc Plating Cr6 free","thickness":"12~17"},
+  {"part":"3154","type":"Zinc Plating Cr6 free","thickness":"12~15"},
+  {"part":"3166","type":"Zinc Plating with sealant","thickness":"12~17"},
+  {"part":"3168","type":"Zinc Plating with sealant","thickness":"12~17"},
+  {"part":"3169","type":"Zinc Plating with sealant","thickness":"12~17"},
+  {"part":"3170","type":"Zinc Plating with sealant","thickness":"12~17"},
+  {"part":"3212","type":"Zinc Plating Cr6 free","thickness":"12~15"},
+  {"part":"3214","type":"Zinc Plating Cr6 free","thickness":"12~15"},
+  {"part":"3315","type":"Zinc Plating Cr6 free","thickness":"5~10"},
+  {"part":"3329","type":"Zinc Plating Cr6 free","thickness":"7~12"},
+  {"part":"3330","type":"Zinc Plating Cr6 free","thickness":"7~12"},
+  {"part":"3331","type":"Zinc Plating Cr6 free","thickness":"7~12"},
+  {"part":"3368","type":"Zinc Nickel Plating without seal CR6 free","thickness":"12~18"},
+  {"part":"3388","type":"Zinc Plating Cr6 free","thickness":"12~18"},
+  {"part":"3412","type":"Zinc Plating with sealant","thickness":"12~18"},
+  {"part":"3434","type":"Zinc Nickel Plating with seal CR6 free","thickness":"12~18"},
+  {"part":"3453","type":"Zinc Plating without sealant","thickness":"8~12"},
+  {"part":"3467","type":"Zinc Plating Cr6 free","thickness":"12~15"},
+  {"part":"3474","type":"Zinc Plating without sealant","thickness":"5~9"},
+  {"part":"3475","type":"Zinc Plating without sealant","thickness":"8~14"},
+  {"part":"3507","type":"Zinc Plating without sealant","thickness":"12~16"},
+  {"part":"3567","type":"Zinc Plating without sealant","thickness":"8~14"},
+  {"part":"3669","type":"Trivalent Zinc Plating Cr6 free","thickness":"12~15"},
+  {"part":"3673","type":"Zinc Plating","thickness":"12~18"},
+  {"part":"3758","type":"Zinc Plating CR3","thickness":"8~13"},
+  {"part":"3820","type":"Zinc Plating Cr6 free","thickness":"8~12"},
+  {"part":"3824","type":"Zinc Nickel Plating","thickness":"12~15"},
+  {"part":"3825","type":"Zinc Nickel Plating","thickness":"12~15"},
+  {"part":"3826","type":"Zinc Nickel Plating","thickness":"12~15"},
+  {"part":"3827","type":"Zinc Nickel Plating","thickness":"12~15"},
+  {"part":"3828","type":"Zinc Nickel Plating","thickness":"12~18"},
+  {"part":"3833","type":"Galvanic Coating","thickness":"12~18"},
+  {"part":"3838","type":"Trivalent Zinc Plating with seal","thickness":"12~15"}
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let PARTS = [...DEFAULT_PARTS];
+let OPERATORS = [...DEFAULT_OPERATORS];
+let MACHINES = [...DEFAULT_MACHINES];
+let selectedPart = null;
+let selectedPass = null;
+let lastOperator = "";
+let lastMachine = "";
+
+// ============================================================
+// INIT
+// ============================================================
+window.onload = () => {
+  // Load saved master data from localStorage if available
+  try {
+    const saved = localStorage.getItem('ye_master');
+    if (saved) {
+      const d = JSON.parse(saved);
+      if (d.parts) PARTS = d.parts;
+      if (d.operators) OPERATORS = d.operators;
+      if (d.machines) MACHINES = d.machines;
+    }
+  } catch(e) {}
+
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('entryDate').value = today;
+  populateDropdowns();
+  renderParts(PARTS);
+};
+
+function saveMaster() {
+  try { localStorage.setItem('ye_master', JSON.stringify({parts:PARTS, operators:OPERATORS, machines:MACHINES})); } catch(e) {}
+}
+
+function populateDropdowns() {
+  const opSel = document.getElementById('operator');
+  opSel.innerHTML = '<option value="">Select operator...</option>' + OPERATORS.map(o => `<option value="${o}"${o===lastOperator?' selected':''}>${o}</option>`).join('');
+  const mcSel = document.getElementById('machine');
+  mcSel.innerHTML = '<option value="">Select machine...</option>' + MACHINES.map(m => `<option value="${m}"${m===lastMachine?' selected':''}>${m}</option>`).join('');
+}
+
+// ============================================================
+// PARTS
+// ============================================================
+function renderParts(list) {
+  const el = document.getElementById('partList');
+  if (!list.length) { el.innerHTML = '<div class="no-results">No parts found</div>'; return; }
+  const show = list.slice(0, 40);
+  el.innerHTML = show.map(p => `
+    <div class="part-item" onclick="selectPart('${p.part.replace(/'/g,"\'")}')">
+      <div class="part-num" style="font-size:${p.part.length > 6 ? '13px' : '19px'};min-width:auto;max-width:120px;word-break:break-word;">${p.part}</div>
+      <div class="part-info"><div class="part-type">${p.type}</div></div>
+      <div class="part-thick">${p.thickness === 'N/A' ? 'N/A' : p.thickness + ' µm'}</div>
+    </div>
+  `).join('');
+  if (list.length > 40) el.innerHTML += `<div class="no-results">Type more to narrow down (${list.length} parts)</div>`;
+}
+
+function filterParts() {
+  const q = document.getElementById('partSearch').value.trim().toLowerCase();
+  renderParts(q ? PARTS.filter(p => p.part.toLowerCase().includes(q) || p.type.toLowerCase().includes(q)) : PARTS);
+}
+
+function selectPart(partId) {
+  selectedPart = PARTS.find(p => p.part === partId);
+  document.getElementById('bannerPartNum').textContent = selectedPart.part;
+  document.getElementById('bannerPartType').textContent = selectedPart.type;
+  const thickSpec = selectedPart.thickness === 'N/A' ? 'No spec defined' : selectedPart.thickness + ' micron';
+  document.getElementById('bannerPartThick').textContent = 'Required: ' + thickSpec;
+  document.getElementById('selectedBanner').classList.add('show');
+  document.getElementById('searchArea').style.display = 'none';
+  checkThickness();
+}
+
+function changePart() {
+  selectedPart = null;
+  document.getElementById('selectedBanner').classList.remove('show');
+  document.getElementById('searchArea').style.display = 'block';
+  document.getElementById('partSearch').value = '';
+  document.getElementById('thickCheck').className = 'thick-check';
+  renderParts(PARTS);
+}
+
+// ============================================================
+// PASSIVATION TYPE
+// ============================================================
+function selectPass(type) {
+  selectedPass = type;
+  ['Yellow','Blue','Black','Silver (Zn-Ni)'].forEach(t => {
+    const id = 'pass' + t.split(' ')[0];
+    document.getElementById(id)?.classList.toggle('selected', t === type);
+  });
+}
+
+// ============================================================
+// THICKNESS CHECK
+// ============================================================
+function checkThickness() {
+  if (!selectedPart) return;
+  const val = parseFloat(document.getElementById('thickness').value);
+  const el = document.getElementById('thickCheck');
+  if (isNaN(val)) { el.className = 'thick-check'; return; }
+  const spec = selectedPart.thickness;
+  let ok = false;
+  if (spec.startsWith('Min')) { ok = val >= parseFloat(spec.replace('Min','')); }
+  else if (spec.includes('~')) { const [a,b] = spec.split('~').map(Number); ok = val >= a && val <= b; }
+  el.className = 'thick-check ' + (ok ? 'ok' : 'fail');
+  el.textContent = ok
+    ? '✅ Thickness OK — within spec (' + spec + ' micron)'
+    : '⚠️ OUT OF SPEC! Required: ' + spec + ' micron — Measured: ' + val;
+}
+
+// ============================================================
+// SUBMIT
+// ============================================================
+function submitEntry() {
+  const date = document.getElementById('entryDate').value;
+  const machine = document.getElementById('machine').value;
+  const op = document.getElementById('operator').value;
+  const timeIn = document.getElementById('timeIn').value;
+  const timeOut = document.getElementById('timeOut').value;
+  const qty = document.getElementById('qty').value;
+  const thick = document.getElementById('thickness').value;
+
+  if (!date||!machine||!op||!selectedPart||!timeIn||!timeOut||!qty||!thick||!selectedPass) {
+    alert('Please fill all fields, select a part and passivation type.');
+    return;
+  }
+
+  lastOperator = op;
+  lastMachine = machine;
+
+  document.getElementById('screenForm').classList.remove('active');
+  document.getElementById('screenSuccess').classList.add('active');
+  document.getElementById('headerSub').textContent = 'Entry Saved ✅';
+  document.getElementById('successTime').textContent = new Date().toLocaleString('en-IN');
+
+  document.getElementById('entrySummary').innerHTML = [
+    ['Date', date], ['Machine', machine], ['Operator', op],
+    ['Part', selectedPart.part],
+    ['Plating Type', selectedPart.type],
+    ['Time IN → OUT', timeIn + ' → ' + timeOut],
+    ['Qty', qty + ' pcs'],
+    ['Thickness', thick + ' micron (Spec: ' + selectedPart.thickness + ')'],
+    ['Passivation Type', selectedPass],
+  ].map(([l,v]) => `<div class="summary-row"><span class="summary-label">${l}</span><span class="summary-val">${v}</span></div>`).join('');
+}
+
+function newEntry() {
+  document.getElementById('screenSuccess').classList.remove('active');
+  document.getElementById('screenForm').classList.add('active');
+  document.getElementById('headerSub').textContent = 'Production Entry';
+  document.getElementById('entryDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('timeIn').value = '';
+  document.getElementById('timeOut').value = '';
+  document.getElementById('qty').value = '';
+  document.getElementById('thickness').value = '';
+  document.getElementById('thickCheck').className = 'thick-check';
+  selectedPass = null;
+  ['Yellow','Blue','Black','Silver'].forEach(t => document.getElementById('pass'+t)?.classList.remove('selected'));
+  populateDropdowns();
+  changePart();
+}
+
+// ============================================================
+// MASTER DATA SCREEN
+// ============================================================
+function showMaster() {
+  ['screenForm','screenSuccess'].forEach(s => document.getElementById(s).classList.remove('active'));
+  document.getElementById('screenMaster').classList.add('active');
+  document.getElementById('headerSub').textContent = 'Master Data';
+  renderMasterLists();
+}
+
+function showForm() {
+  document.getElementById('screenMaster').classList.remove('active');
+  document.getElementById('screenForm').classList.add('active');
+  document.getElementById('headerSub').textContent = 'Production Entry';
+  populateDropdowns();
+  renderParts(PARTS);
+}
+
+function renderMasterLists() {
+  document.getElementById('partCount').textContent = PARTS.length;
+
+  document.getElementById('operatorList').innerHTML = OPERATORS.map((o,i) => `
+    <div class="master-item">
+      <div class="master-item-info"><div class="master-item-title">${o}</div></div>
+      <button class="del-btn" onclick="deleteOperator(${i})">Remove</button>
+    </div>`).join('') || '<div class="no-results">No operators</div>';
+
+  document.getElementById('machineList').innerHTML = MACHINES.map((m,i) => `
+    <div class="master-item">
+      <div class="master-item-info"><div class="master-item-title">${m}</div></div>
+      <button class="del-btn" onclick="deleteMachine(${i})">Remove</button>
+    </div>`).join('') || '<div class="no-results">No machines</div>';
+
+  // Parts with search filter
+  const sq = (document.getElementById('masterPartSearch')?.value || '').trim().toLowerCase();
+  const filtered = sq ? PARTS.filter(p => p.part.toLowerCase().includes(sq) || p.type.toLowerCase().includes(sq)) : PARTS;
+  document.getElementById('recentPartsList').innerHTML = filtered.length
+    ? filtered.map(p => `
+    <div class="master-item">
+      <div class="master-item-info">
+        <div class="master-item-title">${p.part}</div>
+        <div class="master-item-sub">${p.type} · ${p.thickness} µm</div>
+      </div>
+      <button class="del-btn" onclick="deletePart('${p.part.replace(/'/g,"\'")}')">Remove</button>
+    </div>`).join('')
+    : '<div class="no-results">No parts found</div>';
+}
+
+function addOperator() {
+  const v = document.getElementById('newOperator').value.trim();
+  if (!v) return;
+  if (OPERATORS.includes(v)) { alert('Already exists'); return; }
+  OPERATORS.push(v);
+  document.getElementById('newOperator').value = '';
+  saveMaster(); renderMasterLists();
+}
+
+function deleteOperator(i) {
+  if (!confirm('Remove ' + OPERATORS[i] + '?')) return;
+  OPERATORS.splice(i,1); saveMaster(); renderMasterLists();
+}
+
+function addMachine() {
+  const v = document.getElementById('newMachine').value.trim();
+  if (!v) return;
+  if (MACHINES.includes(v)) { alert('Already exists'); return; }
+  MACHINES.push(v);
+  document.getElementById('newMachine').value = '';
+  saveMaster(); renderMasterLists();
+}
+
+function deleteMachine(i) {
+  if (!confirm('Remove ' + MACHINES[i] + '?')) return;
+  MACHINES.splice(i,1); saveMaster(); renderMasterLists();
+}
+
+function addPart() {
+  const num = document.getElementById('newPartNum').value.trim();
+  const type = document.getElementById('newPartType').value.trim();
+  const thick = document.getElementById('newPartThick').value.trim() || 'N/A';
+  if (!num||!type) { alert('Part Name and Plating Type are required.'); return; }
+  if (PARTS.find(p => p.part.toLowerCase() === num.toLowerCase())) { alert(num + ' already exists in parts list'); return; }
+  PARTS.push({part:num, type, thickness:thick});
+  document.getElementById('newPartNum').value = '';
+  document.getElementById('newPartType').value = '';
+  document.getElementById('newPartThick').value = '';
+  saveMaster(); renderMasterLists();
+  alert('✅ ' + num + ' added successfully!');
+}
+
+function deletePart(partName) {
+  if (!confirm('Remove ' + partName + '?')) return;
+  PARTS = PARTS.filter(p => p.part !== partName);
+  saveMaster(); renderMasterLists();
+}
+</script>
+</body>
+</html>

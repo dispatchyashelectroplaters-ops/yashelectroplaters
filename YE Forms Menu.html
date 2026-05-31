@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yash Electroplaters – Forms</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght=500;700&family=DM+Sans:wght=400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    background: #0d1117;
+    font-family: 'DM Sans', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+    overflow-x: hidden;
+  }
+
+  /* Background pattern */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(255,107,53,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,107,53,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 420px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Logo */
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 32px;
+    justify-content: center;
+  }
+
+  .logo-icon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #FF6B35, #f7a97c);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(255,107,53,0.4);
+  }
+
+  .logo-text h1 {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    color: #fff;
+    letter-spacing: 0.5px;
+  }
+
+  .logo-text p {
+    font-size: 12px;
+    color: #8892b0;
+    margin-top: 1px;
+  }
+
+  /* Section label */
+  .section-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: #FF6B35;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  /* Form cards */
+  .form-card {
+    display: block;
+    text-decoration: none;
+    background: #161b27;
+    border: 1px solid #1e2535;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .form-card:nth-child(1) { animation-delay: 0.1s; }
+  .form-card:nth-child(2) { animation-delay: 0.2s; }
+  .form-card:nth-child(3) { animation-delay: 0.3s; }
+
+  .form-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent);
+    border-radius: 3px 0 0 3px;
+  }
+
+  .form-card:active {
+    transform: scale(0.98);
+    border-color: var(--accent);
+    background: #1a2030;
+  }
+
+  .form-icon {
+    width: 50px;
+    height: 50px;
+    min-width: 50px;
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--accent) 15%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+  }
+
+  .form-info { flex: 1; }
+
+  .form-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: #e8eaf0;
+    letter-spacing: 0.3px;
+  }
+
+  .form-desc {
+    font-size: 12px;
+    color: #8892b0;
+    margin-top: 3px;
+  }
+
+  .form-freq {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--accent);
+    margin-top: 5px;
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+
+  .arrow {
+    color: #2a3045;
+    font-size: 20px;
+    transition: transform 0.2s;
+  }
+
+  .form-card:active .arrow {
+    transform: translateX(4px);
+    color: var(--accent);
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    margin-top: 28px;
+    font-size: 12px;
+    color: #3a4055;
+  }
+
+  .time {
+    text-align: center;
+    font-size: 11px;
+    color: #3a4055;
+    margin-bottom: 20px;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="logo">
+    <div class="logo-icon">Y≡</div>
+    <div class="logo-text">
+      <h1>YASH ELECTROPLATERS</h1>
+      <p>Monitoring Forms</p>
+    </div>
+  </div>
+
+  <div class="time" id="timeDisplay"></div>
+
+  <div class="section-label">Select Form to Fill</div>
+
+  <a href="https://forms.gle/5CGwEyMwS8pt1TYr9" target="_blank" class="form-card" style="--accent: #FF6B35;">
+    <div class="form-icon">🔥</div>
+    <div class="form-info">
+      <div class="form-name">Quench Test</div>
+      <div class="form-desc">Record of quench test with photo</div>
+      <div class="form-freq">📅 Daily</div>
+    </div>
+    <div class="arrow">›</div>
+  </a>
+
+  <a href="https://forms.gle/gqrPVipp9B8NHkud8" target="_blank" class="form-card" style="--accent: #2EC4B6;">
+    <div class="form-icon">🧴</div>
+    <div class="form-info">
+      <div class="form-name">Passivation Change</div>
+      <div class="form-desc">Record when passivation is changed</div>
+      <div class="form-freq">🔄 Every 10 days</div>
+    </div>
+    <div class="arrow">›</div>
+  </a>
+
+  <a href="https://forms.gle/WXGzSK2s8N6RzYVq8" target="_blank" class="form-card" style="--accent: #8338EC;">
+    <div class="form-icon">🔩</div>
+    <div class="form-info">
+      <div class="form-name">Filtration Change</div>
+      <div class="form-desc">Record when filtration is changed</div>
+      <div class="form-freq">📆 Every 3 months</div>
+    </div>
+    <div class="arrow">›</div>
+  </a>
+
+  <div class="footer">Yash Electroplaters · Internal Use Only</div>
+
+</div>
+
+<script>
+  function updateTime() {
+    const now = new Date();
+    const options = { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+    document.getElementById('timeDisplay').textContent = now.toLocaleDateString('en-IN', options);
+  }
+  updateTime();
+  setInterval(updateTime, 60000);
+</script>
+
+</body>
+</html>
