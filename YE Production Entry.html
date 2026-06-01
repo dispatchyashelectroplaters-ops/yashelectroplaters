@@ -583,20 +583,24 @@ function submitEntry() {
   lastOperator = op;
   lastMachine = machine;
 
-  document.getElementById('screenForm').classList.remove('active');
-  document.getElementById('screenSuccess').classList.add('active');
-  document.getElementById('headerSub').textContent = 'Entry Saved ✅';
-  document.getElementById('successTime').textContent = new Date().toLocaleString('en-IN');
+  // Build pre-filled Google Form URL
+  const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdTjv1479kMkggr95U4UZzQRn2s55b8COEIQA5ShvhOFCeS3g/viewform";
+  const params = new URLSearchParams({
+    "entry.2052401636": date,
+    "entry.1601809":    machine,
+    "entry.395003182":  op,
+    "entry.623907617":  selectedPart.part,
+    "entry.399043177":  selectedPart.type,
+    "entry.1546008841": timeIn,
+    "entry.270378710":  timeOut,
+    "entry.1290274767": qty,
+    "entry.548312255":  thick,
+    "entry.759555936":  selectedPass
+  });
+  const fullURL = FORM_URL + "?" + params.toString();
 
-  document.getElementById('entrySummary').innerHTML = [
-    ['Date', date], ['Machine', machine], ['Operator', op],
-    ['Part', selectedPart.part],
-    ['Plating Type', selectedPart.type],
-    ['Time IN → OUT', timeIn + ' → ' + timeOut],
-    ['Qty', qty + ' pcs'],
-    ['Thickness', thick + ' micron (Spec: ' + selectedPart.thickness + ')'],
-    ['Passivation Type', selectedPass],
-  ].map(([l,v]) => `<div class="summary-row"><span class="summary-label">${l}</span><span class="summary-val">${v}</span></div>`).join('');
+  // Navigate directly to pre-filled form
+  window.location.href = fullURL;
 }
 
 function newEntry() {
